@@ -18,7 +18,7 @@ brew tap awvwgk/fpm
 brew install fpm
 ```
 
-Now, fix the gcc story:
+Now, fix the `gcc` story:
 
 ```sh
 brew install gcc@11
@@ -36,6 +36,8 @@ ln /usr/local/Cellar/gcc\@11/11.3.0/lib/gcc/11 /usr/local/Cellar/gcc\@11/11.3.0/
 Check out the project and build it:
 
 ```sh
+git clone https://github.com/radekg/fortran-german-salary.git
+cd fortran-german-salary/
 fpm install
 ```
 
