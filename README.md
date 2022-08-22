@@ -29,7 +29,7 @@ ln /usr/local/Cellar/gcc\@11/11.3.0 /usr/local/opt/gcc
 ln /usr/local/Cellar/gcc\@11/11.3.0/lib/gcc/11 /usr/local/Cellar/gcc\@11/11.3.0/lib/gcc/current
 ```
 
-Now fpm will work.
+`fpm` will work now.
 
 ## Build
 
@@ -99,7 +99,7 @@ This program assumes `Individueller Zusatzbeitragssatz` at `0.6%` (half of the u
 
 ## Where do I get some more info about these calculation?
 
-You can find all important information [here]:
+You can find all important information [here](https://www.lohn-info.de/):
 
 - [For 2022](https://www.lohn-info.de/sozialversicherungsbeitraege2022.html).
 - [For 2023](https://www.lohn-info.de/sozialversicherungsbeitraege2023.html).
