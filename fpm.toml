@@ -1,0 +1,18 @@
+name = "german_salary"
+version = "0.1.0"
+license = "Apache 2.0"
+author = "Radek Gruchalski"
+maintainer = "radek@gruchalski.com"
+copyright = "Copyright 2022, radekg"
+
+[dependencies]
+FLAP = { git = "https://github.com/szaghi/FLAP", tag = "v1.2.5" }
+stdlib = { git = "https://github.com/fortran-lang/stdlib", branch = "stdlib-fpm" }
+
+[build]
+auto-executables = true
+auto-tests = true
+auto-examples = true
+
+[install]
+library = false
