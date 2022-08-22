@@ -4,7 +4,7 @@ Calculates German salary employer contributions for a gross number.
 
 ## Why
 
-I wanted to write something in Fortran ages ago. As I was reading about [Flang](https://flang.llvm.org/docs/), I got curious. So, there we are. Some reasonable thing Fortran...
+I wanted to write something in Fortran ages ago. As I was reading about [Flang](https://flang.llvm.org/docs/), I got curious. So, there we are. Some reasonable thing for Fortran...
 
 ## Getting Fortran and fpm on macOS
 
