@@ -126,13 +126,13 @@ Given a gross salary, in 2023:
 - Pflegeversicherung is `3.05%`.
   - In Sachsen, employer pays `1.025%`, employee pays `2.025%`.
   - Outside of Sachsen, employer pays half = `1.525%`, employee pays the other half.
-  - Calculated from on a single gross salary with a top limit of `€4837.5` - `min(€4837.5, single gross salary) * rate`.
+  - Calculated based on a single gross salary with a top limit of `€4837.5` - `min(€4837.5, single gross salary) * rate`.
 - Rentenversicherung is `18.6%` from which the employer pays half = `9.3%`, the employee pays the other half.
-  - Calculated from on a single gross salary with a top limit of:
+  - Calculated based on a single gross salary with a top limit of:
     - Western Bundesland: `€7050` - `min(€7050, single gross salary) * rate`,
     - Eastern Bundesland: `€6750` - `min(€6750, single gross salary) * rate`.
 - Arbeitslosenversicherung is `2.4%` from which the employer pays half = `1.2%`, the employee pays the other half.
-  - Calculated from on a single gross salary with a top limit of:
+  - Calculated based on a single gross salary with a top limit of:
     - Western Bundesland: `€7050` - `min(€7050, single gross salary) * rate`,
     - Eastern Bundesland: `€6750` - `min(€6750, single gross salary) * rate`.
 
