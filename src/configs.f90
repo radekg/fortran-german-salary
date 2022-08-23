@@ -46,10 +46,10 @@ contains
         end do
     end function all_bundeslands
 
-    pure function get_contributions(personal, year, bundesland) result(contributions)
+    pure function get_contributions(personal, u1p, u2p, year, bundesland) result(contributions)
         ! This function initializes social insurance contribution levels.
         ! KV, PV, RV and AV are 50% covered by employers, except of RV in Sachsen whenre employer pays little bit less.
-        real(8), intent(in) :: personal
+        real(8), intent(in) :: personal, u1p, u2p
         integer(4), intent(in) :: year
         character(50), intent(in) :: bundesland
         type(t_contribution_levels) :: contributions
@@ -59,14 +59,14 @@ contains
         ! -------------------
         contributions%bundesland = bundesland
         contributions%kv = 0.073  ! 14.6% in total, half paid by employer = 7.3%
-        contributions%kv_personal = personal / 2.0 / 100.0
+        contributions%kv_personal = personal / 2. / 100.
         contributions%pv = 0.01525 ! 3.05 % in total, half paid by employer = 1.525% outside of Sachsen
         contributions%rv = 0.093   ! 18.6% in total, half paid by employer = 9.3%
         contributions%av = 0.012   ! 2.4% in total, half paid by employer = 1.2%
         ! these depend on the Krankenkasse
-        contributions%u1 = 0.016   ! 1.2%
-        contributions%u2 = 0.0065   ! 0.65%
-        ! Insolvenz is stable
+        contributions%u1 = u1p / 100.
+        contributions%u2 = u2p / 100.
+        ! Insolvenz is the same for everyone
         contributions%u3 = 0.0009   ! 0.09%, 2022
 
         ! ---------------------------

@@ -11,7 +11,8 @@ program main
   implicit none
 
   type(command_line_interface) :: cli ! Command Line Interface (CLI).
-  real(8)                      :: gross, salaries, monthly_gross, annual_gross, kv_personal
+  real(8)                      :: gross, salaries, monthly_gross, annual_gross, &
+                                  kv_personal, u1p, u2p
   integer(4)                   :: year
   character(5)                 :: gross_mode
   character(50)                :: bundesland
@@ -27,6 +28,7 @@ program main
 
   ! init CLI
   call cli%init(description = 'Calculate employer contributions for gross salary')
+
   ! init flags
   call cli%add(switch='--gross', switch_ab='-g', help='Gross salary', &
                required=.true., &
@@ -50,18 +52,31 @@ program main
                def='Nordrhein-Westfalen',  &
                choices=trim(all_bundeslands()), &
                error=error)
-  call cli%add(switch='--kv-personal-contribution', switch_ab='-kvp', &
-               help='Personal health insurance contribution, in total percentage', &
-               required=.false., &
-               act='store',      &
-               def='1.2',        &
-               error=error)
   call cli%add(switch='--year', switch_ab='-yr', &
                help='Year for which the calculation should be done', &
                required=.false.,    &
                act='store',         &
                def='2023',          &
                choices='2022,2023', &
+               error=error)
+
+  call cli%add(switch='--kv-personal-contribution-percent', switch_ab='-kvp', &
+               help='Personal health insurance contribution, in total percentage', &
+               required=.false., &
+               act='store',      &
+               def='1.2',        &
+               error=error)
+  call cli%add(switch='--u1-contribution-percent', switch_ab='-u1', &
+               help='The work incapacity protection contribution, in total percent (U1)', &
+               required=.false., &
+               act='store',      &
+               def='1.6',        &
+               error=error)
+  call cli%add(switch='--u2-contribution-percent', switch_ab='-u2', &
+               help='The matennity protection contribution, in total percent (U2)', &
+               required=.false., &
+               act='store',      &
+               def='0.65',       &
                error=error)
   
   if (error/=0) stop
@@ -71,13 +86,16 @@ program main
   call cli%get(switch='-m', val=gross_mode, error=error)
   call cli%get(switch='-s', val=salaries, error=error)
   call cli%get(switch='-b', val=bundesland, error=error)
-  call cli%get(switch='-kvp', val=kv_personal, error=error)
   call cli%get(switch='-yr', val=year, error=error)
+
+  call cli%get(switch='-kvp', val=kv_personal, error=error)
+  call cli%get(switch='-u1', val=u1p, error=error)
+  call cli%get(switch='-u2', val=u2p, error=error)
 
   if (error/=0) stop
 
   ! Initialize contributions for the configured year
-  contributions = get_contributions(kv_personal, year, bundesland)
+  contributions = get_contributions(kv_personal, u1p, u2p, year, bundesland)
   ! Get the annual and monthly salary
   annual_gross = get_annual_gross(gross, salaries, gross_mode)
   monthly_gross = get_monthly_gross(gross, salaries, gross_mode)
@@ -91,30 +109,30 @@ program main
   u2 = calculate_u2(annual_gross, contributions)
   u3 = calculate_u3(annual_gross, contributions)
 
-  print '(A)', ''
-  print '(A, A)',    make_label('Bundesland', .false.), bundesland
-  print '(A, A)',    make_label('West/East', .false.), west_east_string(is_west(bundesland))
-  print '(A, A)',    make_label('Currency', .false.), 'Euro'
-  print '(A, f10.2)', make_label('Monthly gross salary', .false.), monthly_gross
-  print '(A, f10.2)', make_label('Annual gross salary', .false.), annual_gross
-  print '(A, f10.1)', make_label('# of salaries', .false.), salaries
-  print '(A)',       '--------------------------------------------|'
-  print '(A)', 'Contributions breakdown:'
-  print '(A, f10.2)', make_label('Kranenversicherung', .true.), kv
-  print '(A, f10.2)', make_label('Pflegeversicherung', .true.), pv
-  print '(A, f10.2)', make_label('Rentenversicherung', .true.), rv
-  print '(A, f10.2)', make_label('Arbeitslosenversicherung', .true.), av
-  print '(A)',       '--------------------------------------------|'
-  print '(A)', 'Umlagen:'
-  print '(A, A, f10.2)', make_label('U1 (Arbeitsunfähigkeit)', .true.), ' ', u1 ! extra space because we have an umlaut...
-  print '(A, f10.2)',    make_label('U2 (Mutterschaft)', .true.), u2
-  print '(A, f10.2)',    make_label('U3 (Insolvenz)', .true.), u3
-  print '(A)',       '--------------------------------------------|'
+  print '(a)', ''
+  print '(a, a)',     make_label('Bundesland', .false.), bundesland
+  print '(a, a)',     make_label('West/East', .false.), west_east_string(is_west(bundesland))
+  print '(a, a)',     make_label('Currency', .false.), 'Euro'
+  print '(a, f10.2)', make_label('Monthly gross salary', .false.), monthly_gross
+  print '(a, f10.2)', make_label('Annual gross salary', .false.), annual_gross
+  print '(a, f10.1)', make_label('# of salaries', .false.), salaries
+  print '(a)',       '--------------------------------------------|'
+  print '(a)', 'Contributions breakdown:'
+  print '(a, f10.2)', make_label('Kranenversicherung', .true.), kv
+  print '(a, f10.2)', make_label('Pflegeversicherung', .true.), pv
+  print '(a, f10.2)', make_label('Rentenversicherung', .true.), rv
+  print '(a, f10.2)', make_label('Arbeitslosenversicherung', .true.), av
+  print '(a)',       '--------------------------------------------|'
+  print '(a)', 'Umlagen:'
+  print '(a, a, f10.2)', make_label('U1 (Arbeitsunfähigkeit)', .true.), ' ', u1 ! extra space because we have an umlaut...
+  print '(a, f10.2)',    make_label('U2 (Mutterschaft)', .true.), u2
+  print '(a, f10.2)',    make_label('U3 (Insolvenz)', .true.), u3
+  print '(a)',       '--------------------------------------------|'
 
   to_sum = [ annual_gross, kv, pv, rv, av, u1, u2, u3 ]
   total = sum(to_sum(1: 8))
 
-  print '(A, f10.2)', make_label('Total annual cost', .false.), total
-  print '(A)', ''
+  print '(a, f10.2)', make_label('Total annual cost', .false.), total
+  print '(a)', ''
 
 end program main
