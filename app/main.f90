@@ -73,7 +73,7 @@ program main
                def='1.6',        &
                error=error)
   call cli%add(switch='--u2-contribution-percent', switch_ab='-u2', &
-               help='The matennity protection contribution, in total percent (U2)', &
+               help='The maternity protection contribution, in total percent (U2)', &
                required=.false., &
                act='store',      &
                def='0.65',       &
