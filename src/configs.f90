@@ -5,8 +5,23 @@ module configs
     implicit none
     private
 
+    public :: t_contribution_levels
     public :: all_bundeslands
+    public :: get_contributions
     public :: western
+
+    type :: t_contribution_levels
+        character(50) :: bundesland
+        real(8) :: kv
+        real(8) :: kv_personal
+        real(8) :: pv
+        real(8) :: rv
+        real(8) :: av
+        real(8) :: u1
+        real(8) :: u2
+        real(8) :: u3
+    end type
+
 contains
 
     pure function all_bundeslands() result(output)
@@ -30,6 +45,44 @@ contains
             output = trim(output) // ',' // trim(arr(i))
         end do
     end function all_bundeslands
+
+    pure function get_contributions(personal, year, bundesland) result(contributions)
+        ! This function initializes social insurance contribution levels.
+        ! KV, PV, RV and AV are 50% covered by employers, except of RV in Sachsen whenre employer pays little bit less.
+        real(8), intent(in) :: personal
+        integer(4), intent(in) :: year
+        character(50), intent(in) :: bundesland
+        type(t_contribution_levels) :: contributions
+
+        ! -------------------
+        ! Configure defaults:
+        ! -------------------
+        contributions%bundesland = bundesland
+        contributions%kv = 0.073  ! 14.6% in total, half paid by employer = 7.3%
+        contributions%kv_personal = personal / 2.0 / 100.0
+        contributions%pv = 0.01525 ! 3.05 % in total, half paid by employer = 1.525% outside of Sachsen
+        contributions%rv = 0.093   ! 18.6% in total, half paid by employer = 9.3%
+        contributions%av = 0.012   ! 2.4% in total, half paid by employer = 1.2%
+        ! these depend on the Krankenkasse
+        contributions%u1 = 0.016   ! 1.2%
+        contributions%u2 = 0.0065   ! 0.65%
+        ! Insolvenz is stable
+        contributions%u3 = 0.0009   ! 0.09%, 2022
+
+        ! ---------------------------
+        ! AV in Sachsen is different:
+        ! ---------------------------
+        if (bundesland == 'Sachsen') then
+            contributions%pv = 0.01025 ! 3.05 % in total, employer = 1.025% when in Sachsen
+        end if
+
+        ! ------------------
+        ! Year 2023 changes:
+        ! ------------------
+        if (year == 2023) then
+            contributions%u3 = 0.0015   ! 0.15%
+        end if
+    end function get_contributions
 
     pure function western() result(out)
         character(50), dimension(11) :: out !< There are 11 Western Bundeslands.

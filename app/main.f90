@@ -2,7 +2,7 @@
 program main
 
   use flap, only : command_line_interface
-  use configs, only: all_bundeslands
+  use configs, only: all_bundeslands, get_contributions, t_contribution_levels
   use utils, only: get_annual_gross, get_monthly_gross, make_label, west_east_string
   use german_salary, only: calculate_kv, calculate_pv, calculate_rv, calculate_av, &
                            calculate_u1, calculate_u2, calculate_u3, &
@@ -11,11 +11,14 @@ program main
   implicit none
 
   type(command_line_interface) :: cli ! Command Line Interface (CLI).
-  real(8)                      :: gross, salaries, monthly_gross, annual_gross
+  real(8)                      :: gross, salaries, monthly_gross, annual_gross, kv_personal
+  integer(4)                   :: year
   character(5)                 :: gross_mode
   character(50)                :: bundesland
 
   integer         :: error  ! Error trapping flag.
+
+  type(t_contribution_levels) :: contributions
 
   ! define calculation results
   ! TODO: apparently one can do class-like objects in Fortran...
@@ -47,6 +50,19 @@ program main
                def='Nordrhein-Westfalen',  &
                choices=trim(all_bundeslands()), &
                error=error)
+  call cli%add(switch='--kv-personal-contribution', switch_ab='-kvp', &
+               help='Personal health insurance contribution, in total percentage', &
+               required=.false., &
+               act='store',      &
+               def='1.2',        &
+               error=error)
+  call cli%add(switch='--year', switch_ab='-yr', &
+               help='Year for which the calculation should be done', &
+               required=.false.,    &
+               act='store',         &
+               def='2023',          &
+               choices='2022,2023', &
+               error=error)
   
   if (error/=0) stop
 
@@ -55,20 +71,25 @@ program main
   call cli%get(switch='-m', val=gross_mode, error=error)
   call cli%get(switch='-s', val=salaries, error=error)
   call cli%get(switch='-b', val=bundesland, error=error)
+  call cli%get(switch='-kvp', val=kv_personal, error=error)
+  call cli%get(switch='-yr', val=year, error=error)
 
   if (error/=0) stop
 
+  ! Initialize contributions for the configured year
+  contributions = get_contributions(kv_personal, year, bundesland)
+  ! Get the annual and monthly salary
   annual_gross = get_annual_gross(gross, salaries, gross_mode)
   monthly_gross = get_monthly_gross(gross, salaries, gross_mode)
+  ! Calculate
+  kv = calculate_kv(monthly_gross, contributions) * salaries
+  pv = calculate_pv(monthly_gross, contributions) * salaries
+  rv = calculate_rv(monthly_gross, contributions) * salaries
+  av = calculate_av(monthly_gross, contributions) * salaries
 
-  kv = calculate_kv(monthly_gross) * salaries
-  pv = calculate_pv(monthly_gross) * salaries
-  rv = calculate_rv(monthly_gross, bundesland) * salaries
-  av = calculate_av(monthly_gross, bundesland) * salaries
-
-  u1 = calculate_u1(annual_gross)
-  u2 = calculate_u2(annual_gross)
-  u3 = calculate_u3(annual_gross)
+  u1 = calculate_u1(annual_gross, contributions)
+  u2 = calculate_u2(annual_gross, contributions)
+  u3 = calculate_u3(annual_gross, contributions)
 
   print '(A)', ''
   print '(A, A)',    make_label('Bundesland', .false.), bundesland
