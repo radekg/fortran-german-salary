@@ -132,7 +132,7 @@ program main
   to_sum = [ annual_gross, kv, pv, rv, av, u1, u2, u3 ]
   total = sum(to_sum(1: 8))
 
-  print '(a, f10.2)', make_label('Total annual cost', .false.), total
+  print '(a, f10.2)', make_label('Total annual employee cost', .false.), total
   print '(a)', ''
 
 end program main

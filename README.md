@@ -93,7 +93,7 @@ Umlagen:
   U2 (Mutterschaft):                  555.10
   U3 (Insolvenz):                      76.86
 --------------------------------------------|
-Total annual cost:                 102748.44
+Total annual employee cost:        102748.44
 
 ```
 
