@@ -20,7 +20,7 @@ module configs
               bundesland_is_west,  &
               cutoff_kv, cutoff_pv, &
               cutoff_rv, cutoff_av, &
-              get_contributions
+              new_contributions
 
     type :: t_contribution_levels
         character(50) :: bundesland
@@ -111,7 +111,7 @@ contains
         end if
     end function cutoff_av
 
-    pure type(t_contribution_levels) function get_contributions(personal, u1p, u2p, year, bundesland) result(res)
+    pure type(t_contribution_levels) function new_contributions(personal, u1p, u2p, year, bundesland) result(res)
         ! This function initializes social insurance contribution levels.
         ! KV, PV, RV and AV are 50% covered by employers, except of RV in Sachsen whenre employer pays little bit less.
         real(8), intent(in) :: personal, u1p, u2p
@@ -136,9 +136,9 @@ contains
         ! Insolvenz is statutory
         res%u3 = u3_2022
         if (year >= 2023) then
-            get_contributions%u3 = u3_2023
+            res%u3 = u3_2023
         end if
         
-    end function get_contributions
+    end function new_contributions
 
 end module configs
