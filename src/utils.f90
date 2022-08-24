@@ -8,7 +8,7 @@ contains
 
     pure real(8) function get_monthly_gross(gross, salaries, mode)
         real(8), intent(in) :: gross, salaries
-        character(5), intent(in) :: mode
+        character(*), intent(in) :: mode
         if (mode == 'annum') then
             get_monthly_gross = gross / salaries
         else
@@ -18,7 +18,7 @@ contains
 
     pure real(8) function get_annual_gross(gross, salaries, mode)
         real(8), intent(in) :: gross, salaries
-        character(5), intent(in) :: mode
+        character(*), intent(in) :: mode
         if (mode == 'annum') then
             get_annual_gross = gross
         else
@@ -27,7 +27,7 @@ contains
     end function get_annual_gross
 
     pure character(34) function make_label(input, indent)
-        character(len=*), intent(in)  :: input
+        character(*), intent(in)  :: input
         integer, intent(in), optional :: indent
         make_label = input//': '
          ! suprisingly, if (present(var).and.var) leads to a segmentation fault

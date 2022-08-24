@@ -84,7 +84,7 @@ contains
     pure logical function bundesland_is_west(bundesland) result(res)
         ! This function returns .true. if given bundesland is a Western bundesland,
         ! .false. otherwise.
-        character(50), intent(in) :: bundesland
+        character(*), intent(in) :: bundesland
         res = any(bundeslands_western == bundesland)
     end function bundesland_is_west
 
@@ -98,7 +98,7 @@ contains
     end function cutoff_kv
 
     pure real function cutoff_rv(bundesland)
-        character(50), intent(in) :: bundesland
+        character(*), intent(in) :: bundesland
         cutoff_rv = 7050.0
         if (.not.bundesland_is_west(bundesland)) then
             cutoff_rv = 6750.0
@@ -106,7 +106,7 @@ contains
     end function cutoff_rv
 
     pure real function cutoff_av(bundesland)
-        character(50), intent(in) :: bundesland
+        character(*), intent(in) :: bundesland
         cutoff_av = 7050.0
         if (.not.bundesland_is_west(bundesland)) then
             cutoff_av = 6750.0
@@ -118,7 +118,7 @@ contains
         ! KV, PV, RV and AV are 50% covered by employers, except of RV in Sachsen whenre employer pays little bit less.
         real(8), intent(in) :: personal, u1p, u2p
         integer(4), intent(in) :: year
-        character(50), intent(in) :: bundesland
+        character(*), intent(in) :: bundesland
 
         res%bundesland = bundesland
         res%kv = kv
