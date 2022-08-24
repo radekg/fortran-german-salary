@@ -1,6 +1,6 @@
 program check
 
-    use german_salary, only: is_west
+    use calculations, only: is_west
 
 implicit none
 
@@ -16,5 +16,7 @@ implicit none
         write(*,*)'FAILED: ',trim(east_bundesland),' was West but should have been East'
         stop 2
     end if
+
+    print *, repeat(' ', 2)
 
 end program check

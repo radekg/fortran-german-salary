@@ -4,7 +4,7 @@ program main
   use flap, only : command_line_interface
   use configs, only: all_bundeslands, get_contributions, t_contribution_levels
   use utils, only: get_annual_gross, get_monthly_gross, make_label, west_east_string
-  use german_salary, only: calculate_kv, calculate_pv, calculate_rv, calculate_av, &
+  use calculations, only: calculate_kv, calculate_pv, calculate_rv, calculate_av, &
                            calculate_u1, calculate_u2, calculate_u3, &
                            is_west                           
 
@@ -110,29 +110,29 @@ program main
   u3 = calculate_u3(annual_gross, contributions)
 
   print '(a)', ''
-  print '(a, a)',     make_label('Bundesland', .false.), bundesland
-  print '(a, a)',     make_label('West/East', .false.), west_east_string(is_west(bundesland))
-  print '(a, a)',     make_label('Currency', .false.), 'Euro'
-  print '(a, f10.2)', make_label('Monthly gross salary', .false.), monthly_gross
-  print '(a, f10.2)', make_label('Annual gross salary', .false.), annual_gross
-  print '(a, f10.1)', make_label('# of salaries', .false.), salaries
+  print '(a, a)',     make_label('Bundesland'), bundesland
+  print '(a, a)',     make_label('West/East'), west_east_string(is_west(bundesland))
+  print '(a, a)',     make_label('Currency'), 'Euro'
+  print '(a, f10.2)', make_label('Monthly gross salary'), monthly_gross
+  print '(a, f10.2)', make_label('Annual gross salary'), annual_gross
+  print '(a, f10.1)', make_label('# of salaries'), salaries
   print '(a)',       '--------------------------------------------|'
   print '(a)', 'Contributions breakdown:'
-  print '(a, f10.2)', make_label('Kranenversicherung', .true.), kv
-  print '(a, f10.2)', make_label('Pflegeversicherung', .true.), pv
-  print '(a, f10.2)', make_label('Rentenversicherung', .true.), rv
-  print '(a, f10.2)', make_label('Arbeitslosenversicherung', .true.), av
+  print '(a, f10.2)', make_label('Kranenversicherung', indent=2), kv
+  print '(a, f10.2)', make_label('Pflegeversicherung', indent=2), pv
+  print '(a, f10.2)', make_label('Rentenversicherung', indent=2), rv
+  print '(a, f10.2)', make_label('Arbeitslosenversicherung', indent=2), av
   print '(a)',       '--------------------------------------------|'
   print '(a)', 'Umlagen:'
-  print '(a, a, f10.2)', make_label('U1 (Arbeitsunfähigkeit)', .true.), ' ', u1 ! extra space because we have an umlaut...
-  print '(a, f10.2)',    make_label('U2 (Mutterschaft)', .true.), u2
-  print '(a, f10.2)',    make_label('U3 (Insolvenz)', .true.), u3
+  print '(a, a, f10.2)', make_label('U1 (Arbeitsunfähigkeit)', indent=2), ' ', u1 ! extra space because we have an umlaut...
+  print '(a, f10.2)',    make_label('U2 (Mutterschaft)', indent=2), u2
+  print '(a, f10.2)',    make_label('U3 (Insolvenz)', indent=2), u3
   print '(a)',       '--------------------------------------------|'
 
   to_sum = [ annual_gross, kv, pv, rv, av, u1, u2, u3 ]
   total = sum(to_sum(1: 8))
 
-  print '(a, f10.2)', make_label('Total annual employee cost', .false.), total
+  print '(a, f10.2)', make_label('Total annual employee cost'), total
   print '(a)', ''
 
 end program main

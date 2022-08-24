@@ -6,45 +6,43 @@ module utils
     public :: get_monthly_gross, get_annual_gross, make_label, west_east_string
 contains
 
-    pure function get_monthly_gross(gross, salaries, mode) result(monthly)
+    pure real(8) function get_monthly_gross(gross, salaries, mode)
         real(8), intent(in) :: gross, salaries
         character(5), intent(in) :: mode
-        real(8) :: monthly
         if (mode == 'annum') then
-            monthly = gross / salaries
+            get_monthly_gross = gross / salaries
         else
-            monthly = gross
+            get_monthly_gross = gross
         end if
     end function get_monthly_gross
 
-    pure function get_annual_gross(gross, salaries, mode) result(annual)
+    pure real(8) function get_annual_gross(gross, salaries, mode)
         real(8), intent(in) :: gross, salaries
         character(5), intent(in) :: mode
-        real(8) :: annual
         if (mode == 'annum') then
-            annual = gross
+            get_annual_gross = gross
         else
-            annual = gross * salaries
+            get_annual_gross = gross * salaries
         end if
     end function get_annual_gross
 
-    pure function make_label (input, indent) result(output)
-        character(len=*), intent(in) :: input
-        logical, intent(in)         :: indent
-        character(34)               :: output
-        output = input//': '
-        if (indent) then
-            output = '  '//trim(output)
+    pure character(34) function make_label(input, indent)
+        character(len=*), intent(in)  :: input
+        integer, intent(in), optional :: indent
+        make_label = input//': '
+         ! suprisingly, if (present(var).and.var) leads to a segmentation fault
+        if (present(indent)) then
+            if (indent > 0) then
+                make_label = repeat(' ', indent)//trim(make_label)
+            end if
         end if
     end function make_label
 
-    pure function west_east_string(input) result(output)
-        logical, intent(in) :: input
-        character(20) :: output
-        if (input) then
-            output = "West"
-        else
-            output = "East"
+    pure character(20) function west_east_string(west)
+        logical, intent(in) :: west
+        west_east_string = "West"
+        if (.not.west) then
+            west_east_string = "East"
         end if
     end function west_east_string
 
