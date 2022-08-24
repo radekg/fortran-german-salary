@@ -13,10 +13,14 @@ module configs
     real(8), parameter :: u3_2022 = 0.0009 ! statutory 0.09% in 2022
     real(8), parameter :: u3_2023 = 0.0015 ! statutory 0.15% in 2023
 
-    public :: t_contribution_levels
-    public :: all_bundeslands
-    public :: get_contributions
-    public :: western
+    public :: t_contribution_levels, &
+              bundeslands_all, &
+              bundeslands_eastern, &
+              bundeslands_western, &
+              bundesland_is_west,  &
+              cutoff_kv, cutoff_pv, &
+              cutoff_rv, cutoff_av, &
+              get_contributions
 
     type :: t_contribution_levels
         character(50) :: bundesland
@@ -27,7 +31,7 @@ module configs
 
 contains
 
-    pure character(1000) function all_bundeslands() result(output)
+    pure character(1000) function bundeslands_all() result(output)
         ! The dimension here isn't optimal but list of Bundelands is the
         ! least variable setting in this program.
         ! --------------------------------------------------------------
@@ -35,8 +39,8 @@ contains
         integer(4) :: i
         ! merge arrays
         ! ------------
-        arr(1:11) = western()
-        arr(12:) = eastern()
+        arr(1:11) = bundeslands_western()
+        arr(12:) = bundeslands_eastern()
         ! then sort the resulting array
         ! -----------------------------
         call sort(arr)
@@ -46,40 +50,22 @@ contains
         do i=2, size(arr), 1
             output = trim(output) // ',' // trim(arr(i))
         end do
-    end function all_bundeslands
+    end function bundeslands_all
 
-    pure type(t_contribution_levels) function get_contributions(personal, u1p, u2p, year, bundesland)
-        ! This function initializes social insurance contribution levels.
-        ! KV, PV, RV and AV are 50% covered by employers, except of RV in Sachsen whenre employer pays little bit less.
-        real(8), intent(in) :: personal, u1p, u2p
-        integer(4), intent(in) :: year
-        character(50), intent(in) :: bundesland
+    pure function bundeslands_eastern() result(out)
+        ! This function returns the list of Eastern bundeslands.
+        character(50), dimension(6) :: out
+        out = [ character(50) :: 'Berlin-Ost', &
+            'Brandenburg', &
+            'Mecklenburg-Vorpommern', &
+            'Sachsen', &
+            'Sachsen-Anhalt', &
+            'Thüringen' ]
+    end function bundeslands_eastern
 
-        get_contributions%bundesland = bundesland
-        get_contributions%kv = kv
-        get_contributions%kv_personal = personal / 2. / 100.
-        get_contributions%pv = pv_outside_sachsen
-        get_contributions%rv = rv
-
-        get_contributions%av = av 
-        if (bundesland == 'Sachsen') then
-            get_contributions%pv = pv_in_sachsen
-        end if
-
-        ! these depend on the Krankenkasse
-        get_contributions%u1 = u1p / 100.
-        get_contributions%u2 = u2p / 100.
-
-        ! Insolvenz is statutory
-        get_contributions%u3 = u3_2022
-        if (year >= 2023) then
-            get_contributions%u3 = u3_2023
-        end if
-        
-    end function get_contributions
-
-    pure function western() result(out)
-        character(50), dimension(11) :: out !< There are 11 Western Bundeslands.
+    pure function bundeslands_western() result(out)
+        ! This function returns the list of Western bundeslands.
+        character(50), dimension(11) :: out
         out = [ character(50) :: 'Baden-Württemberg', &
             'Bayern', &
             'Berlin-West', &
@@ -91,16 +77,68 @@ contains
             'Rheinland-Pfalz', &
             'Saarland', &
             'Schleswig-Holstein' ]
-    end function western
+    end function bundeslands_western
 
-    pure function eastern() result(out)
-        character(50), dimension(6) :: out !< There are 6 Eastern Bundeslands.
-        out = [ character(50) :: 'Berlin-Ost', &
-            'Brandenburg', &
-            'Mecklenburg-Vorpommern', &
-            'Sachsen', &
-            'Sachsen-Anhalt', &
-            'Thüringen' ]
-    end function eastern
+    pure logical function bundesland_is_west(bundesland) result(res)
+        ! This function returns .true. if given bundesland is a Western bundesland,
+        ! .false. otherwise.
+        character(50), intent(in) :: bundesland
+        res = any(bundeslands_western() == bundesland)
+    end function bundesland_is_west
+
+    ! Cutoff value configurations
+    pure real function cutoff_pv()
+        cutoff_pv = 4837.5
+    end function cutoff_pv
+
+    pure real function cutoff_kv()
+        cutoff_kv = 4837.5
+    end function cutoff_kv
+
+    pure real function cutoff_rv(bundesland)
+        character(50), intent(in) :: bundesland
+        cutoff_rv = 7050.0
+        if (.not.bundesland_is_west(bundesland)) then
+            cutoff_rv = 6750.0
+        end if
+    end function cutoff_rv
+
+    pure real function cutoff_av(bundesland)
+        character(50), intent(in) :: bundesland
+        cutoff_av = 7050.0
+        if (.not.bundesland_is_west(bundesland)) then
+            cutoff_av = 6750.0
+        end if
+    end function cutoff_av
+
+    pure type(t_contribution_levels) function get_contributions(personal, u1p, u2p, year, bundesland) result(res)
+        ! This function initializes social insurance contribution levels.
+        ! KV, PV, RV and AV are 50% covered by employers, except of RV in Sachsen whenre employer pays little bit less.
+        real(8), intent(in) :: personal, u1p, u2p
+        integer(4), intent(in) :: year
+        character(50), intent(in) :: bundesland
+
+        res%bundesland = bundesland
+        res%kv = kv
+        res%kv_personal = personal / 2. / 100.
+        res%pv = pv_outside_sachsen
+        res%rv = rv
+
+        res%av = av 
+        if (bundesland == 'Sachsen') then
+            res%pv = pv_in_sachsen
+        end if
+
+        ! these depend on the Krankenkasse
+        res%u1 = u1p / 100.
+        res%u2 = u2p / 100.
+
+        ! Insolvenz is statutory
+        res%u3 = u3_2022
+        if (year >= 2023) then
+            get_contributions%u3 = u3_2023
+        end if
+        
+    end function get_contributions
 
 end module configs

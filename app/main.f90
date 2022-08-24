@@ -2,11 +2,11 @@
 program main
 
   use flap, only : command_line_interface
-  use configs, only: all_bundeslands, get_contributions, t_contribution_levels
+  use configs, only: bundeslands_all, bundesland_is_west, &
+                     get_contributions, t_contribution_levels
   use utils, only: get_annual_gross, get_monthly_gross, make_label, west_east_string
   use calculations, only: calculate_kv, calculate_pv, calculate_rv, calculate_av, &
-                           calculate_u1, calculate_u2, calculate_u3, &
-                           is_west                           
+                          calculate_u1, calculate_u2, calculate_u3
 
   implicit none
 
@@ -50,7 +50,7 @@ program main
                required=.false.,           &
                act='store',                &
                def='Nordrhein-Westfalen',  &
-               choices=trim(all_bundeslands()), &
+               choices=trim(bundeslands_all()), &
                error=error)
   call cli%add(switch='--year', switch_ab='-yr', &
                help='Year for which the calculation should be done', &
@@ -111,7 +111,7 @@ program main
 
   print '(a)', ''
   print '(a, a)',     make_label('Bundesland'), bundesland
-  print '(a, a)',     make_label('West/East'), west_east_string(is_west(bundesland))
+  print '(a, a)',     make_label('West/East'), west_east_string(bundesland_is_west(bundesland))
   print '(a, a)',     make_label('Currency'), 'Euro'
   print '(a, f10.2)', make_label('Monthly gross salary'), monthly_gross
   print '(a, f10.2)', make_label('Annual gross salary'), annual_gross
