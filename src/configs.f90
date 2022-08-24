@@ -3,7 +3,11 @@ module configs
     use stdlib_sorting, only: sort
 
     implicit none
-    private
+    private :: kv, &
+               pv_outside_sachsen, &
+               pv_in_sachsen, &
+               rv, av, &
+               u3_2022, u3_2023
 
     real(8), parameter :: kv = 0.073 ! 14.6% in total, half paid by employer = 7.3%
     real(8), parameter :: pv_outside_sachsen = 0.01525 ! 3.05 % in total, half paid by employer = 1.525% outside of Sachsen
