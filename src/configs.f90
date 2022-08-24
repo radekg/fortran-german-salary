@@ -39,12 +39,18 @@ contains
         ! The dimension here isn't optimal but list of Bundelands is the
         ! least variable setting in this program.
         ! --------------------------------------------------------------
-        character(50), dimension(17) :: arr
+        ! Instead of doing:
+        ! character(50), dimension(17) :: arr, I can do:
+        ! character(50), allocatable :: arr(:)
+        character(50), allocatable :: arr(:), western(:), eastern(:)
         integer(4) :: i
         ! merge arrays
         ! ------------
-        arr(1:11) = bundeslands_western()
-        arr(12:) = bundeslands_eastern()
+        western = bundeslands_western()
+        eastern = bundeslands_eastern()
+        allocate(character(50) :: arr(size(western) + size(eastern)))
+        arr(1:11) = western
+        arr(12:)  = eastern
         ! then sort the resulting array
         ! -----------------------------
         call sort(arr)
@@ -58,7 +64,7 @@ contains
 
     pure function bundeslands_eastern() result(out)
         ! This function returns the list of Eastern bundeslands.
-        character(50), dimension(6) :: out
+        character(50), allocatable :: out(:)
         out = [ character(50) :: 'Berlin-Ost', &
             'Brandenburg', &
             'Mecklenburg-Vorpommern', &
@@ -69,7 +75,7 @@ contains
 
     pure function bundeslands_western() result(out)
         ! This function returns the list of Western bundeslands.
-        character(50), dimension(11) :: out
+        character(50), allocatable :: out(:)
         out = [ character(50) :: 'Baden-Württemberg', &
             'Bayern', &
             'Berlin-West', &
