@@ -17,10 +17,26 @@ module configs
     real(8), parameter :: u3_2022 = 0.0009 ! statutory 0.09% in 2022
     real(8), parameter :: u3_2023 = 0.0015 ! statutory 0.15% in 2023
 
+    character(50), parameter :: bundeslands_eastern(6) = [ character(50) :: 'Berlin-Ost', &
+                                        'Brandenburg', &
+                                        'Mecklenburg-Vorpommern', &
+                                        'Sachsen', &
+                                        'Sachsen-Anhalt', &
+                                        'Thüringen' ]
+    character(50), parameter :: bundeslands_western(11) = [ character(50) :: 'Baden-Württemberg', &
+                                        'Bayern', &
+                                        'Berlin-West', &
+                                        'Bremen', &
+                                        'Hamburg', &
+                                        'Hessen', &
+                                        'Niedersachsen', &
+                                        'Nordrhein-Westfalen', &
+                                        'Rheinland-Pfalz', &
+                                        'Saarland', &
+                                        'Schleswig-Holstein' ]
+
     public :: t_contribution_levels, &
               bundeslands_all, &
-              bundeslands_eastern, &
-              bundeslands_western, &
               bundesland_is_west,  &
               cutoff_kv, cutoff_pv, &
               cutoff_rv, cutoff_av, &
@@ -40,17 +56,17 @@ contains
         ! least variable setting in this program.
         ! --------------------------------------------------------------
         ! Instead of doing:
-        ! character(50), dimension(17) :: arr, I can do:
-        ! character(50), allocatable :: arr(:)
-        character(50), allocatable :: arr(:), western(:), eastern(:)
+        !   character(50), dimension(17) :: arr, I can do:
+        !   character(50), allocatable :: arr(:)
+        ! There's a second method for declaring an array with fixed size:
+        !   character(50) :: arr(17)
+        character(50), allocatable :: arr(:)
         integer(4) :: i
         ! merge arrays
         ! ------------
-        western = bundeslands_western()
-        eastern = bundeslands_eastern()
-        allocate(character(50) :: arr(size(western) + size(eastern)))
-        arr(1:11) = western
-        arr(12:)  = eastern
+        allocate(character(50) :: arr(size(bundeslands_western) + size(bundeslands_eastern)))
+        arr(1:size(bundeslands_western)) = bundeslands_western
+        arr(size(bundeslands_western)+1:)  = bundeslands_eastern
         ! then sort the resulting array
         ! -----------------------------
         call sort(arr)
@@ -60,40 +76,14 @@ contains
         do i=2, size(arr), 1
             output = trim(output) // ',' // trim(arr(i))
         end do
+        deallocate(arr)
     end function bundeslands_all
-
-    pure function bundeslands_eastern() result(out)
-        ! This function returns the list of Eastern bundeslands.
-        character(50), allocatable :: out(:)
-        out = [ character(50) :: 'Berlin-Ost', &
-            'Brandenburg', &
-            'Mecklenburg-Vorpommern', &
-            'Sachsen', &
-            'Sachsen-Anhalt', &
-            'Thüringen' ]
-    end function bundeslands_eastern
-
-    pure function bundeslands_western() result(out)
-        ! This function returns the list of Western bundeslands.
-        character(50), allocatable :: out(:)
-        out = [ character(50) :: 'Baden-Württemberg', &
-            'Bayern', &
-            'Berlin-West', &
-            'Bremen', &
-            'Hamburg', &
-            'Hessen', &
-            'Niedersachsen', &
-            'Nordrhein-Westfalen', &
-            'Rheinland-Pfalz', &
-            'Saarland', &
-            'Schleswig-Holstein' ]
-    end function bundeslands_western
 
     pure logical function bundesland_is_west(bundesland) result(res)
         ! This function returns .true. if given bundesland is a Western bundesland,
         ! .false. otherwise.
         character(50), intent(in) :: bundesland
-        res = any(bundeslands_western() == bundesland)
+        res = any(bundeslands_western == bundesland)
     end function bundesland_is_west
 
     ! Cutoff value configurations
