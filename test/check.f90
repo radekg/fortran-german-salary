@@ -1,19 +1,19 @@
 program check
 
-    use configs, only: bundesland_is_west
+    use types, only: Bundesland
 
 implicit none
 
-    character(50), parameter :: west_bundesland = 'Bayern'
-    character(50), parameter :: east_bundesland = 'Sachsen'
+    type(Bundesland), parameter :: west_bundesland = Bundesland('Bayern')
+    type(Bundesland), parameter :: east_bundesland = Bundesland('Sachsen')
 
-    if (.not.bundesland_is_west(west_bundesland)) then
-        write(*,*)'FAILED: expected ',trim(west_bundesland),' as West'
+    if (.not. west_bundesland%is_west()) then
+        write(*,*)'FAILED: expected ',trim(west_bundesland%name),' as West'
         stop 1
     end if
 
-    if (bundesland_is_west(east_bundesland)) then
-        write(*,*)'FAILED: ',trim(east_bundesland),' was West but should have been East'
+    if (east_bundesland%is_west()) then
+        write(*,*)'FAILED: ',trim(east_bundesland%name),' was West but should have been East'
         stop 2
     end if
 

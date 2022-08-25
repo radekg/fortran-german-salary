@@ -2,8 +2,8 @@
 program main
 
     use flap, only : command_line_interface
-    use configs, only: bundeslands_all, bundesland_is_west, &
-                       new_contributions, t_contribution_levels
+    use types, only: all_bundeslands, Bundesland, ContributionsParams, &
+                     ContributionLevels
     use utils, only: get_annual_gross, get_monthly_gross, make_label, west_east_string
     use calculations, only: calculate_kv, calculate_pv, calculate_rv, calculate_av, &
                             calculate_u1, calculate_u2, calculate_u3
@@ -11,15 +11,17 @@ program main
     implicit none
 
     type(command_line_interface) :: cli ! Command Line Interface (CLI).
-    real(8)                      :: gross, salaries, monthly_gross, annual_gross, &
-                                    kv_personal, u1p, u2p
-    integer(4)                   :: year
-    character(5)                 :: gross_mode
-    character(50)                :: bundesland
+    real(8)                      :: input_gross, input_salaries, &
+                                    monthly_gross, annual_gross, &
+                                    input_kv_personal, input_u1, input_u2
+    integer(4)                   :: input_year
+    character(5)                 :: input_gross_mode
+    character(50)                :: input_bundesland
 
     integer         :: error  ! Error trapping flag.
 
-    type(t_contribution_levels) :: contributions
+    type(ContributionsParams) :: contributions_params
+    type(ContributionLevels) :: contributions
 
     ! define calculation results
     ! TODO: apparently one can do class-like objects in Fortran...
@@ -47,10 +49,10 @@ program main
                 choices='12.0,13.0,14.0', &
                 error=error)
     call cli%add(switch='--bundesland', switch_ab='-b', help='Bundesland', &
-                required=.false.,           &
-                act='store',                &
-                def='Nordrhein-Westfalen',  &
-                choices=trim(bundeslands_all()), &
+                required=.false.,                &
+                act='store',                     &
+                def='Nordrhein-Westfalen',       &
+                choices=trim(all_bundeslands()), &
                 error=error)
     call cli%add(switch='--year', switch_ab='-yr', &
                 help='Year for which the calculation should be done', &
@@ -82,40 +84,46 @@ program main
     if (error/=0) stop
 
     ! get data passed on the command line
-    call cli%get(switch='-g', val=gross, error=error)
-    call cli%get(switch='-m', val=gross_mode, error=error)
-    call cli%get(switch='-s', val=salaries, error=error)
-    call cli%get(switch='-b', val=bundesland, error=error)
-    call cli%get(switch='-yr', val=year, error=error)
-
-    call cli%get(switch='-kvp', val=kv_personal, error=error)
-    call cli%get(switch='-u1', val=u1p, error=error)
-    call cli%get(switch='-u2', val=u2p, error=error)
+    call cli%get(switch='-g', val=input_gross, error=error)
+    call cli%get(switch='-m', val=input_gross_mode, error=error)
+    call cli%get(switch='-s', val=input_salaries, error=error)
+    call cli%get(switch='-b', val=input_bundesland, error=error)
+    call cli%get(switch='-yr', val=input_year, error=error)
+    call cli%get(switch='-kvp', val=input_kv_personal, error=error)
+    call cli%get(switch='-u1', val=input_u1, error=error)
+    call cli%get(switch='-u2', val=input_u2, error=error)
 
     if (error/=0) stop
 
     ! Initialize contributions for the configured year
-    contributions = new_contributions(kv_personal, u1p, u2p, year, bundesland)
+    contributions_params = ContributionsParams( &
+        kv_personal=input_kv_personal,           &
+        bundesland=Bundesland(input_bundesland), &
+        year=input_year,                         &
+        u1=input_u1,                             &
+        u2=input_u2)
+    contributions = ContributionLevels(params=contributions_params)
+
     ! Get the annual and monthly salary
-    annual_gross = get_annual_gross(gross, salaries, gross_mode)
-    monthly_gross = get_monthly_gross(gross, salaries, gross_mode)
+    annual_gross = get_annual_gross(input_gross, input_salaries, input_gross_mode)
+    monthly_gross = get_monthly_gross(input_gross, input_salaries, input_gross_mode)
     ! Calculate
-    kv = calculate_kv(monthly_gross, contributions) * salaries
-    pv = calculate_pv(monthly_gross, contributions) * salaries
-    rv = calculate_rv(monthly_gross, contributions) * salaries
-    av = calculate_av(monthly_gross, contributions) * salaries
+    kv = calculate_kv(monthly_gross, contributions) * input_salaries
+    pv = calculate_pv(monthly_gross, contributions) * input_salaries
+    rv = calculate_rv(monthly_gross, contributions) * input_salaries
+    av = calculate_av(monthly_gross, contributions) * input_salaries
 
     u1 = calculate_u1(annual_gross, contributions)
     u2 = calculate_u2(annual_gross, contributions)
     u3 = calculate_u3(annual_gross, contributions)
 
     print '(a)', ''
-    print '(a, a)',     make_label('Bundesland'), bundesland
-    print '(a, a)',     make_label('West/East'), west_east_string(bundesland_is_west(bundesland))
+    print '(a, a)',     make_label('Bundesland'), contributions%params%bundesland%name
+    print '(a, a)',     make_label('West/East'), contributions%params%bundesland%region_string()
     print '(a, a)',     make_label('Currency'), 'Euro'
     print '(a, f10.2)', make_label('Monthly gross salary'), monthly_gross
     print '(a, f10.2)', make_label('Annual gross salary'), annual_gross
-    print '(a, f10.1)', make_label('# of salaries'), salaries
+    print '(a, f10.1)', make_label('# of salaries'), input_salaries
     print '(a)',       '--------------------------------------------|'
     print '(a)', 'Contributions breakdown:'
     print '(a, f10.2)', make_label('Kranenversicherung', indent=2), kv
