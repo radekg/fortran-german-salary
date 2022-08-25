@@ -4,7 +4,7 @@ program main
     use flap, only : command_line_interface
     use types, only: all_bundeslands, Bundesland, ContributionsParams, &
                      ContributionLevels
-    use utils, only: get_annual_gross, get_monthly_gross, make_label, west_east_string
+    use utils, only: get_annual_gross, get_monthly_gross, make_label
     use calculations, only: calculate_kv, calculate_pv, calculate_rv, calculate_av, &
                             calculate_u1, calculate_u2, calculate_u3
 

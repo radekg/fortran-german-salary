@@ -3,7 +3,7 @@ module utils
     implicit none
     private
 
-    public :: get_monthly_gross, get_annual_gross, make_label, west_east_string
+    public :: get_monthly_gross, get_annual_gross, make_label
 contains
 
     pure real(8) function get_monthly_gross(gross, salaries, mode)
@@ -37,13 +37,5 @@ contains
             end if
         end if
     end function make_label
-
-    pure character(20) function west_east_string(west)
-        logical, intent(in) :: west
-        west_east_string = "West"
-        if (.not.west) then
-            west_east_string = "East"
-        end if
-    end function west_east_string
 
 end module utils
