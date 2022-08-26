@@ -80,7 +80,7 @@ West/East:                        West
 Currency:                         Euro
 Monthly gross salary:                6100.00
 Annual gross salary:                85400.00
-# of salaries:                          14.0
+# of salaries:                            14
 --------------------------------------------|
 Contributions breakdown:
   Kranenversicherung:                5350.27
@@ -101,19 +101,19 @@ Total annual employee cost:        102748.44
 
 Required switches:
 
-- `--gross value`, `-g value`: Gross salary
+- `--gross value`, `-g value`: Gross salary.
 
 Optional switches:
 
-- `--mode value`, `-m value`, value in: `annum,month`, default value `annum`: Gross salary mode
-- `--salaries value`, `-s value`, value in: `12.0,13.0,14.0`, default value `12.0`: Number of salaries
-- `--bundesland value`, `-b value`, value in: `Baden-Württemberg,Bayern,Berlin-Ost,Berlin-West,Brandenburg,Bremen,Hamburg,Hessen,Mecklenburg-Vorpommern,Niedersachsen,Nordrhein-Westfalen,Rheinland-Pfalz,Saarland,Sachsen,Sachsen-Anhalt,Schleswig-Holstein,Thüringen`, default value `Nordrhein-Westfalen`: Bundesland
-- `--year value`, `-yr value`, value in: `2022,2023`, default value `2023`: Year for which the calculation should be done
-- `--kv-personal-contribution-percent value`, `-kvp value`, default value `1.2`: Personal health insurance contribution, in total percentage
-- `--u1-contribution-percent value`, `-u1 value`, default value `1.6`: The work incapacity protection contribution, in total percent (U1)
-- `--u2-contribution-percent value`, `-u2 value`, default value `0.65`: The maternity protection contribution, in total percent (U2)
-- `--help`, `-h`: Print this help message
-- `--version`, `-v`: Print version
+- `--mode value`, `-m value`, value in: `annum,month`, default value `annum`: Gross salary mode.
+- `--salaries value`, `-s value`, value in: `12,13,14`, default value `12`: Number of salaries.
+- `--bundesland value`, `-b value`, value in: `Baden-Württemberg,Bayern,Berlin-Ost,Berlin-West,Brandenburg,Bremen,Hamburg,Hessen,Mecklenburg-Vorpommern,Niedersachsen,Nordrhein-Westfalen,Rheinland-Pfalz,Saarland,Sachsen,Sachsen-Anhalt,Schleswig-Holstein,Thüringen`, default value `Nordrhein-Westfalen`: Bundesland.
+- `--year value`, `-yr value`, value in: `2022,2023`, default value `2023`: Year for which the calculation should be done.
+- `--kv-personal-contribution-percent value`, `-kvp value`, default value `1.2`: Personal health insurance contribution, in total percentage.
+- `--u1-contribution-percent value`, `-u1 value`, default value `1.6`: The work incapacity protection contribution, in total percent (U1).
+- `--u2-contribution-percent value`, `-u2 value`, default value `0.65`: The maternity protection contribution, in total percent (U2).
+- `--help`, `-h`: Print this help message.
+- `--version`, `-v`: Print version.
 
 ## German social insurance for employers in a nutshell
 
