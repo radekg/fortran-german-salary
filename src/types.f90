@@ -7,28 +7,30 @@ module types
     private :: bundeslands_eastern, &
                bundeslands_western
 
-    character(50), parameter :: bundeslands_eastern(6) = [ character(50) :: 'Berlin-Ost', &
-               'Brandenburg', &
-               'Mecklenburg-Vorpommern', &
-               'Sachsen', &
-               'Sachsen-Anhalt', &
-               'Thüringen' ]
-    character(50), parameter :: bundeslands_western(11) = [ character(50) :: 'Baden-Württemberg', &
-               'Bayern', &
-               'Berlin-West', &
-               'Bremen', &
-               'Hamburg', &
-               'Hessen', &
-               'Niedersachsen', &
-               'Nordrhein-Westfalen', &
-               'Rheinland-Pfalz', &
-               'Saarland', &
-               'Schleswig-Holstein' ]
+    character(50), parameter :: bundeslands_eastern(6) = [  &
+        character(50) :: 'Berlin-Ost',                      &
+        'Brandenburg',                                      &
+        'Mecklenburg-Vorpommern',                           &
+        'Sachsen',                                          &
+        'Sachsen-Anhalt',                                   &
+        'Thüringen' ]
+    character(50), parameter :: bundeslands_western(11) = [ &
+        character(50) :: 'Baden-Württemberg',               &
+        'Bayern',                                           &
+        'Berlin-West',                                      &
+        'Bremen',                                           &
+        'Hamburg',                                          &
+        'Hessen',                                           &
+        'Niedersachsen',                                    &
+        'Nordrhein-Westfalen',                              &
+        'Rheinland-Pfalz',                                  &
+        'Saarland',                                         &
+        'Schleswig-Holstein' ]
 
-    public :: Bundesland, &
-              ContributionsParams, &
-              ContributionLevels, &
-              StatutoryDefaults, &
+    public :: Bundesland,           &
+              ContributionsParams,  &
+              ContributionLevels,   &
+              StatutoryDefaults,    &
               all_bundeslands
 
     type :: StatutoryDefaults
@@ -130,12 +132,12 @@ contains
     ! ContributionLevels type:
     ! ------------------------
 
-    pure real function kv(self)
+    pure real(8) function kv(self)
         class(ContributionLevels), intent(in) :: self
         kv = self%statutory%kv + self%params%kv_personal / 2. / 100.
     end function kv
 
-    pure real function pv(self)
+    pure real(8) function pv(self)
         class(ContributionLevels), intent(in) :: self
         pv = self%statutory%pv_outside_sachsen
         if (self%params%bundesland%is_sachsen()) then
@@ -143,27 +145,27 @@ contains
         end if
     end function pv
 
-    pure real function rv(self)
+    pure real(8) function rv(self)
         class(ContributionLevels), intent(in) :: self
         rv = self%statutory%rv
     end function rv
 
-    pure real function av(self)
+    pure real(8) function av(self)
         class(ContributionLevels), intent(in) :: self
         av = self%statutory%av
     end function av
 
-    pure real function u1(self)
+    pure real(8) function u1(self)
         class(ContributionLevels), intent(in) :: self
         u1 = self%params%u1 / 100.
     end function u1
 
-    pure real function u2(self)
+    pure real(8) function u2(self)
         class(ContributionLevels), intent(in) :: self
         u2 = self%params%u2 / 100.
     end function u2
 
-    pure real function u3(self)
+    pure real(8) function u3(self)
         class(ContributionLevels), intent(in) :: self
         u3 = self%statutory%u3_2022
         if (self%params%year >= 2023) then
@@ -171,17 +173,17 @@ contains
         end if
     end function u3
 
-    pure real function cutoff_kv(self)
+    pure real(8) function cutoff_kv(self)
         class(ContributionLevels), intent(in) :: self
         cutoff_kv = 4837.5
     end function cutoff_kv
 
-    pure real function cutoff_pv(self)
+    pure real(8) function cutoff_pv(self)
         class(ContributionLevels), intent(in) :: self
         cutoff_pv = 4837.5
     end function cutoff_pv
 
-    pure real function cutoff_rv(self)
+    pure real(8) function cutoff_rv(self)
         class(ContributionLevels), intent(in) :: self
         cutoff_rv = 7050.0
         if (.not. self%params%bundesland%is_west()) then
